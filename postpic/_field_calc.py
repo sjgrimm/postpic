@@ -16,6 +16,7 @@
 #
 # Stephan Kuschel 2014-2019
 # Alexander Blinne, 2017
+# Sarah Jane Grimm, 2026
 """
 Field related routines.
 """
@@ -339,6 +340,27 @@ class FieldAnalyzer(object):
         ret.unit = 'J/m^3'
         ret.name = 'Energy Density EM-Field'
         ret.shortname = 'EM'
+        return ret
+    
+    def intensity(self, **kwargs):
+        Ex = self._Ex(**kwargs)
+        Ey = self._Ey(**kwargs)
+        Ez = self._Ez(**kwargs)
+
+        Bx = self._Bx(**kwargs)
+        By = self._By(**kwargs)
+        Bz = self._Bz(**kwargs)
+
+        Sx = (Ey * Bz - Ez * By) / pc.mu0
+        Sy = (Ez * Bx - Ex * Bz) / pc.mu0
+        Sz = (Ex * By - Ey * Bx) / pc.mu0
+
+        I = np.sqrt(Sx**2 + Sy**2 + Sz**2)
+
+        ret = self._createfieldfromdata(I, self.gridkeyE('x', **kwargs))
+        ret.unit = 'W/m^2'
+        ret.name = 'Intensity'
+        ret.shortname = 'I'
         return ret
 
     def _divE1d(self, **kwargs):
